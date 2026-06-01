@@ -1255,6 +1255,10 @@
       /* topbar/footer */
       footer { padding: 18px 12px !important; }
     }
+    /* === v1.18.9 — input[type=number] +/- 버튼 (모바일에서만 보임, PC에선 숨김) === */
+    .num-spinner { display: inline-block; width: 100%; }
+    .num-spinner-btn { display: none; } /* PC에선 안 보임 */
+
     /* === v1.18.9 — 사용자 모바일 다듬기 (홈/AI 카드 정렬·학번·사진·input화살표 등) === */
     @media (max-width: 720px) {
       /* 1번 — AI/음악 인트로의 .ai-features (01/02/03 단계 카드): 모바일에서 가로 정렬 */
@@ -1273,14 +1277,28 @@
       input[type="number"] {
         -moz-appearance: number-input;
       }
-      input[type="number"]::-webkit-inner-spin-button,
-      input[type="number"]::-webkit-outer-spin-button {
-        -webkit-appearance: inner-spin-button !important;
-        opacity: 1 !important;
-        margin: 0;
-        height: 28px;
-        cursor: pointer;
+      /* 모바일에서만 .num-spinner wrap 효과 적용 (PC는 입력칸 모양 그대로 유지) */
+      .num-spinner { display: inline-flex !important; align-items: stretch; width: 100%; }
+      .num-spinner > input {
+        flex: 1 !important;
+        border-radius: 0 !important;
+        border-left: 0 !important; border-right: 0 !important;
+        text-align: center;
       }
+      .num-spinner-btn {
+        display: flex !important;
+        align-items: center; justify-content: center;
+        width: 44px; min-height: 42px;
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-size: 20px; font-weight: 700;
+        cursor: pointer; user-select: none;
+        padding: 0; line-height: 1;
+      }
+      .num-spinner-btn:first-child { border-radius: var(--r-sm) 0 0 var(--r-sm); }
+      .num-spinner-btn:last-child  { border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+      .num-spinner-btn:active { background: var(--bg-3); }
       /* 8번 — 이수한/이수중 과목 모바일 입력 UX 전면 보강 */
       .course-table tbody tr { padding: 14px !important; }
       /* 🚨 핵심: 기본 CSS의 td width 25%/15%/14% 등을 모바일에서 100%로 강제 (안 그러면 input이 좁아짐) */
@@ -1309,9 +1327,16 @@
       /* 분류 트리 — 2단/3단 모바일에서 보기 좋게 */
       .cat-tree { gap: 7px !important; }
       .cat-tree select { min-height: 40px; font-size: 14px !important; }
-      /* tags (원격/실습/타학) 모바일에서 터치 영역 ↑ */
-      .course-tags { gap: 10px !important; flex-wrap: wrap; margin-top: 10px !important; }
-      .ctag { padding: 6px 10px !important; font-size: 12.5px !important; min-height: 32px; align-items: center; }
+      /* tags (원격/실습/타학) 모바일에서 한 줄에 — flex-wrap: nowrap 강제 */
+      .course-tags {
+        gap: 8px !important; flex-wrap: nowrap !important;
+        margin-top: 10px !important;
+      }
+      .ctag {
+        padding: 6px 8px !important; font-size: 12.5px !important;
+        min-height: 32px; align-items: center;
+        white-space: nowrap !important;
+      }
       .ctag input[type=checkbox] { width: 16px !important; height: 16px !important; }
       /* 삭제 버튼 (모바일 터치 권장 36x36px) */
       .course-table .btn-remove {
@@ -4225,6 +4250,47 @@
       renderSemesters();
       renderCriteria();
       updateReport();
+      setupNumberSpinners(); // v1.18.9 — input[type=number] 옆에 +/- 버튼 추가 (모바일에서만 보임)
+    }
+
+    /**
+     * v1.18.9 — 모든 input[type=number] 옆에 +/- 버튼 wrap 추가.
+     *
+     * 모바일 (iOS Safari 등)에선 webkit spinner가 안 보여서 숫자 input 조정이 불편함.
+     * → JS로 .num-spinner wrap + 양 옆에 - / + 버튼 추가.
+     *
+     * 버튼은 PC에선 CSS display:none, 모바일(@media max-width:720px)에선 display:flex로 표시.
+     * 이미 wrap된 input은 dataset 마커로 skip (중복 방지).
+     */
+    function setupNumberSpinners() {
+      document.querySelectorAll('input[type="number"]').forEach(input => {
+        if (input.dataset.spinnerWrapped) return; // 중복 방지
+        if (input.closest('.num-spinner')) { input.dataset.spinnerWrapped = '1'; return; } // 이미 wrap됨
+        input.dataset.spinnerWrapped = '1';
+        const parent = input.parentNode;
+        const wrap = document.createElement('span');
+        wrap.className = 'num-spinner';
+        const minus = document.createElement('button');
+        minus.type = 'button'; minus.className = 'num-spinner-btn'; minus.textContent = '−';
+        minus.setAttribute('aria-label', '감소');
+        minus.addEventListener('click', () => {
+          input.stepDown();
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+        const plus = document.createElement('button');
+        plus.type = 'button'; plus.className = 'num-spinner-btn'; plus.textContent = '+';
+        plus.setAttribute('aria-label', '증가');
+        plus.addEventListener('click', () => {
+          input.stepUp();
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+        parent.insertBefore(wrap, input);
+        wrap.appendChild(minus);
+        wrap.appendChild(input);
+        wrap.appendChild(plus);
+      });
     }
     // v1.17.1 / v1.18.7 — 채점용 미리보기 더미 데이터
     // 이재아의 실제 수강 기록 기반. mid 스킴(학번 2023) cat 매핑.
