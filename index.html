@@ -1255,6 +1255,90 @@
       /* topbar/footer */
       footer { padding: 18px 12px !important; }
     }
+    /* === v1.18.9 — 사용자 모바일 다듬기 (홈/AI 카드 정렬·학번·사진·input화살표 등) === */
+    @media (max-width: 720px) {
+      /* 1번 — AI/음악 인트로의 .ai-features (01/02/03 단계 카드): 모바일에서 가로 정렬 */
+      .ai-features { grid-template-columns: 1fr 1fr 1fr !important; gap: 8px !important; }
+      .ai-features .ai-feat { padding: 12px 10px !important; }
+      .ai-features .ai-feat .n { font-size: 13px !important; margin-bottom: 6px !important; }
+      .ai-features .ai-feat h4 { font-size: 13px !important; margin-bottom: 4px !important; line-height: 1.3; }
+      .ai-features .ai-feat p { font-size: 11.5px !important; line-height: 1.35 !important; }
+      /* 2번 — 홈의 진단 시작 3개 카드 (.feature-grid-3): 모바일에서 세로 정렬 */
+      .feature-grid.feature-grid-3 { grid-template-columns: 1fr !important; }
+      /* 3번 — 상단 학번 [202313564] 모바일에서 숨김 (공간 부족) */
+      .brand-sub { display: none !important; }
+      /* 5번 — 자기소개 사진 가운데 정렬 */
+      .photo-frame { margin-left: auto !important; margin-right: auto !important; }
+      /* 6번 — input type=number의 spinner 화살표 강제 표시 (모바일 기본 숨김 해제) */
+      input[type="number"] {
+        -moz-appearance: number-input;
+      }
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: inner-spin-button !important;
+        opacity: 1 !important;
+        margin: 0;
+        height: 28px;
+        cursor: pointer;
+      }
+      /* 8번 — 이수한/이수중 과목 모바일 입력 UX 전면 보강 */
+      .course-table tbody tr { padding: 14px !important; }
+      /* 🚨 핵심: 기본 CSS의 td width 25%/15%/14% 등을 모바일에서 100%로 강제 (안 그러면 input이 좁아짐) */
+      .course-table tbody td.c-name,
+      .course-table tbody td.c-code,
+      .course-table tbody td.c-prof,
+      .course-table tbody td.c-credit,
+      .course-table tbody td.c-grade,
+      .course-table tbody td.c-cat,
+      .course-table tbody td.c-x { width: 100% !important; }
+      .course-table tbody td {
+        grid-template-columns: 76px 1fr !important;
+        gap: 10px !important;
+        padding: 6px 0 !important;
+      }
+      .course-table tbody td::before {
+        font-size: 12.5px !important;
+      }
+      .course-table input,
+      .course-table select {
+        font-size: 15px !important;
+        padding: 10px 10px !important;
+        min-height: 42px;
+        width: 100%;
+      }
+      /* 분류 트리 — 2단/3단 모바일에서 보기 좋게 */
+      .cat-tree { gap: 7px !important; }
+      .cat-tree select { min-height: 40px; font-size: 14px !important; }
+      /* tags (원격/실습/타학) 모바일에서 터치 영역 ↑ */
+      .course-tags { gap: 10px !important; flex-wrap: wrap; margin-top: 10px !important; }
+      .ctag { padding: 6px 10px !important; font-size: 12.5px !important; min-height: 32px; align-items: center; }
+      .ctag input[type=checkbox] { width: 16px !important; height: 16px !important; }
+      /* 삭제 버튼 (모바일 터치 권장 36x36px) */
+      .course-table .btn-remove {
+        width: 38px !important; height: 38px !important;
+        font-size: 18px !important;
+      }
+      /* 학기 헤더 — 모바일에서 줄바꿈 + 버튼 정렬 */
+      .sem-head {
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+        padding: 14px !important;
+      }
+      .sem-title { width: 100%; }
+      /* 학기 헤더의 + 과목 추가 / × 학기 삭제 버튼 영역 */
+      .sem-head > div:last-child {
+        width: 100% !important;
+        display: flex !important;
+        gap: 10px !important;
+      }
+      .sem-head > div:last-child .btn {
+        flex: 1 !important;
+        min-height: 40px !important;
+        font-size: 13.5px !important;
+        padding: 8px 10px !important;
+      }
+    }
+
     @media (max-width: 480px) {
       /* 더 좁은 화면 — 균형교양 4부문 1열, AI Q1 옵션 2열 → 1열, hero slide 더 작게 */
       .balanced-grid { grid-template-columns: 1fr !important; }
@@ -2222,7 +2306,7 @@
         <div class="input-card" data-card-id="criteria">
           <div class="input-card-head">
             <div>
-              <h3>졸업요건</h3>
+              <h3>이수학점(교육과정)</h3>
             </div>
             <button class="card-collapse-btn" type="button" aria-label="카드 접기/펼치기" aria-expanded="true">▾</button>
           </div>
@@ -2440,7 +2524,7 @@
         </div>
         <div class="ai-step" data-step="catalog">
           <div class="page-head" style="margin-bottom: 24px;">
-            <button class="btn btn-ghost btn-sm" id="catalogBackBtn" type="button" style="margin-bottom: 12px;">← 인트로로</button>
+            <button class="btn btn-ghost btn-sm" id="catalogBackBtn" type="button" style="margin-bottom: 12px;">← 뒤로가기</button>
             <h2 class="page-title" style="font-size: 28px;">전체 도구 카탈로그</h2>
             <p class="subtitle" style="font-size: 15px;">진단을 거치지 않고 그냥 둘러보고 싶을 때.</p>
           </div>
@@ -4080,11 +4164,14 @@
         else if (r.gpa >= 2.5) msgs.push(`누적 평점 <strong>${r.gpa.toFixed(2)}</strong>. 재수강을 고려해보세요.`);
         else msgs.push(`누적 평점 <strong>${r.gpa.toFixed(2)}</strong>로 낮은 편입니다. 재수강 우선순위 확인 권장.`);
       }
-      if (r.semGpa.length >= 2) {
-        const last = r.semGpa[r.semGpa.length - 1].gpa;
-        const prev = r.semGpa[r.semGpa.length - 2].gpa;
-        if (last > prev + 0.2) msgs.push(`최근 학기 평점이 <strong>+${(last - prev).toFixed(2)} 상승</strong>했습니다.`);
-        else if (last < prev - 0.2) msgs.push(`최근 학기 평점이 <strong>-${(prev - last).toFixed(2)} 하락</strong>했습니다.`);
+      // v1.18.8 — 정규학기끼리만 평점 추이 비교 (계절학기·수강중 학기·null 학기 제외)
+      // 이전엔 W1(겨울계절학기, 1과목만 있어도 학기로 계산) → 정규학기 평점과 비교돼 통계 왜곡
+      const regSemGpa = r.semGpa.filter(s => s.gpa !== null && REG_SEM_ORDER.includes(s.sem));
+      if (regSemGpa.length >= 2) {
+        const last = regSemGpa[regSemGpa.length - 1].gpa;
+        const prev = regSemGpa[regSemGpa.length - 2].gpa;
+        if (last > prev + 0.2) msgs.push(`최근 학기 평점이 <strong>+${(last - prev).toFixed(2)} 상승</strong>했습니다. (정규학기 기준)`);
+        else if (last < prev - 0.2) msgs.push(`최근 학기 평점이 <strong>-${(prev - last).toFixed(2)} 하락</strong>했습니다. (정규학기 기준)`);
       }
 
       // 조기졸업 자격 분석 (v1.4.0)
@@ -4198,7 +4285,7 @@
           ],
           // 1학년 겨울학기 — 데이터활용개론 교수명은 김아욱(웹 교수) 그대로 유지
           'W1': [
-            mk('데이터활용개론', '22500010', '김아욱', 3, '자유선택', false, {grade: 'C+'})
+            mk('데이터활용개론', '22500010', '김아욱', 3, '자유선택', false, {grade: 'A0', online: true})
           ],
           // 2학년 1학기 (수강중) — 전염병/AI윤리/모두의AI 3과목 원격수업
           //   웹프로그래밍 교수는 김아욱(실제 교수) 유지
